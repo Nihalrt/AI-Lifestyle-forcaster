@@ -1,0 +1,14 @@
+# API Keys - Most Important!
+Secrets.plist
+
+# Xcode general build files
+build/
+DerivedData/
+
+# Xcode user-specific files
+*.xcodeproj/project.xcworkspace
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Other system files
+.DS_Store
