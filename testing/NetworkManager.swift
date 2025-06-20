@@ -27,10 +27,13 @@ class NetworkManager{
             throw NetworkError.invalidURL
         }
         
+        print("NetworkManager: Attempting to fetch URL: \(url.absoluteString)")
+
+        
         let (data, response) = try await URLSession.shared.data(from: url)
         
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw NetworkError.requestFailed
+            throw NetworkError.requestFailed    
         }
         
         do {

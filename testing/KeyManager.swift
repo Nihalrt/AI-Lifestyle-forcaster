@@ -17,6 +17,9 @@ struct KeyManager {
         guard let secrets = secrets, let value = secrets[key] as? String else {
             fatalError("Could not find key '\(key)' in Secrets.plist.")
         }
+        
+        print(" KeyManager: Reading value --\(value)--")
+
         return value
     }
 }

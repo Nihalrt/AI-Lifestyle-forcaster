@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct testingApp: App {
+    @StateObject private var themeManager = ThemeManager()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
+                // This modifier makes the themeManager available to MainTabView
+                // and all of its child views (like ContentView and PlannerView).
+                .environmentObject(themeManager)
         }
     }
 }
