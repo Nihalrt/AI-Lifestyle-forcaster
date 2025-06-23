@@ -1,8 +1,9 @@
-# Nimbus: The AI-Powered Lifestyle Weather Assistant
+# AI Weather App
 
-| Now Screen | Planner Screen |
-| :---: | :---: |
-| ![Now Screen Placeholder](https://ibb.co/pjpJY51L) | ![Planner Screen Placeholder](https://ibb.co/G4gR9vF5) |
+## Screenshots
+<img width="259" alt="Screenshot 2025-05-20 172442" src="https://ibb.co/pjpJY51L" />
+<img width="263" alt="Screenshot 2025-05-20 172521" src="https://ibb.co/G4gR9vF5" />
+
 
 *(Note: Replace the placeholder images above with actual screenshots of the app by updating the URLs.)*
 
