@@ -2,7 +2,7 @@
 
 ## Screenshots
 <img width="300" alt="Image" src="https://github.com/user-attachments/assets/25710671-ce29-4e1d-9c7e-0474782748d3" />
-<img width="300" alt="Image" src="https://github.com/user-attachments/assets/88db133e-fb7b-4667-bb8d-a36dc61ceaf8" />
+<img width="250" alt="Image" src="https://github.com/user-attachments/assets/88db133e-fb7b-4667-bb8d-a36dc61ceaf8" />
 
 *(Note: Replace the placeholder images above with actual screenshots of the app by updating the URLs.)*
 
