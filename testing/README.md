@@ -1,9 +1,8 @@
 # AI Weather App
 
 ## Screenshots
-<img width="259" alt="Screenshot 2025-05-20 172442" src="https://ibb.co/pjpJY51L" />
-<img width="263" alt="Screenshot 2025-05-20 172521" src="https://ibb.co/G4gR9vF5" />
-
+<img width="544" alt="Image" src="https://github.com/user-attachments/assets/25710671-ce29-4e1d-9c7e-0474782748d3" />
+<img width="498" alt="Image" src="https://github.com/user-attachments/assets/88db133e-fb7b-4667-bb8d-a36dc61ceaf8" />
 
 *(Note: Replace the placeholder images above with actual screenshots of the app by updating the URLs.)*
 
