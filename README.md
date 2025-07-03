@@ -1,4 +1,4 @@
-# AI Weather Advisor
+# AI Weather App
 
 An intelligent, SwiftUI-based iOS weather application designed to provide personalized, actionable insights by translating complex environmental data into clear, human-friendly advice.
 
