@@ -1,1 +1,1 @@
-# AI-Lifestyle-forcaster
+# AI WEATHER APP
