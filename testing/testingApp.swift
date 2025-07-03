@@ -10,6 +10,9 @@ import SwiftUI
 @main
 struct testingApp: App {
     @StateObject private var themeManager = ThemeManager()
+    @StateObject private var weatherViewModel = WeatherViewModel()
+
+    
 
     var body: some Scene {
         WindowGroup {
@@ -17,6 +20,8 @@ struct testingApp: App {
                 // This modifier makes the themeManager available to MainTabView
                 // and all of its child views (like ContentView and PlannerView).
                 .environmentObject(themeManager)
+                .environmentObject(weatherViewModel)
+
         }
     }
 }

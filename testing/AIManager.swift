@@ -67,7 +67,6 @@ class AIManager {
     {
         var components = URLComponents()
         components.scheme = "https"
-        // THIS LINE IS NOW CORRECTED
         components.host = "generativelanguage.googleapis.com"
         components.path = "/v1beta/models/gemini-1.5-flash-latest:generateContent"
         components.queryItems = [URLQueryItem(name: "key", value: apiKey)]

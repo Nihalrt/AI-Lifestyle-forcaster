@@ -4,47 +4,70 @@ enum NetworkError: Error {
     case invalidURL
     case requestFailed
     case decodingFailed
+    case noData
 }
 
-class NetworkManager{
-    
-    static let shared  =  NetworkManager()
-    private init(){}
-    
+class NetworkManager {
+    static let shared = NetworkManager()
+    private init() {}
+
+    // Function for Current Weather
     func fetchWeather(for city: String, apiKey: String) async throws -> WeatherResponse {
-        
-        let endpoint = "https://api.openweathermap.org/data/2.5/weather"
-        guard var urlComponents = URLComponents(string: endpoint) else {
-            throw NetworkError.invalidURL
-        }
-        urlComponents.queryItems = [
+        var components = URLComponents(string: "https://api.openweathermap.org/data/2.5/weather")
+        components?.queryItems = [
             URLQueryItem(name: "q", value: city),
             URLQueryItem(name: "appid", value: apiKey),
             URLQueryItem(name: "units", value: "metric")
         ]
         
-        guard let url = urlComponents.url else {
-            throw NetworkError.invalidURL
-        }
-        
-        print("NetworkManager: Attempting to fetch URL: \(url.absoluteString)")
-
+        guard let url = components?.url else { throw NetworkError.invalidURL }
         
         let (data, response) = try await URLSession.shared.data(from: url)
         
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw NetworkError.requestFailed    
+            throw NetworkError.requestFailed
         }
         
         do {
-            let decoder = JSONDecoder()
-            return try decoder.decode(WeatherResponse.self, from: data)
+            // We no longer need the keyDecodingStrategy here, as our model handles it.
+            return try JSONDecoder().decode(WeatherResponse.self, from: data)
         } catch {
+            print("‼️ Current weather decoding failed: \(error)")
             throw NetworkError.decodingFailed
         }
-        
     }
+
+    // Function for OpenUV API
+    func fetchUVIndex(lat: Double, lon: Double, apiKey: String) async throws -> OpenUVResponse {
+        guard let url = URL(string: "https://api.openuv.io/api/v1/uv?lat=\(lat)&lng=\(lon)") else {
+            throw NetworkError.invalidURL
+        }
         
-    
-    
+        var request = URLRequest(url: url)
+        request.setValue(apiKey, forHTTPHeaderField: "x-access-token")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw NetworkError.requestFailed
+        }
+
+        return try JSONDecoder().decode(OpenUVResponse.self, from: data)
+    }
+
+    // Function for WAQI API
+    func fetchAQI(for city: String, apiKey: String) async throws -> AQIResponse {
+        let formattedCity = city.split(separator: ",").first?.lowercased().replacingOccurrences(of: " ", with: "-") ?? ""
+        guard let url = URL(string: "https://api.waqi.info/feed/\(formattedCity)/?token=\(apiKey)") else {
+            throw NetworkError.invalidURL
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw NetworkError.requestFailed
+        }
+
+        return try JSONDecoder().decode(AQIResponse.self, from: data)
+    }
 }

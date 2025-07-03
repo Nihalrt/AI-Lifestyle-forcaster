@@ -14,7 +14,7 @@ struct MainTabView: View {
                 
             }
             
-            Text("Health Screen - coming soon").tabItem{
+            HealthView().tabItem{
                 Label("Health", systemImage: "heart.fill")
             }
             
