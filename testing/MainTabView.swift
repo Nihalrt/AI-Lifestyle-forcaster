@@ -19,7 +19,7 @@ struct MainTabView: View {
             }
             
             
-            Text("Settings Screen - Coming soon").tabItem{
+            SettingsView().tabItem{
                 Label("Settings", systemImage: "gearshape.fill")
             }
             

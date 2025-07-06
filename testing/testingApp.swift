@@ -11,6 +11,8 @@ import SwiftUI
 struct testingApp: App {
     @StateObject private var themeManager = ThemeManager()
     @StateObject private var weatherViewModel = WeatherViewModel()
+    @StateObject private var locationsViewModel = LocationsViewModel()
+    
 
     
 
@@ -21,6 +23,7 @@ struct testingApp: App {
                 // and all of its child views (like ContentView and PlannerView).
                 .environmentObject(themeManager)
                 .environmentObject(weatherViewModel)
+                .environmentObject(locationsViewModel)
 
         }
     }
