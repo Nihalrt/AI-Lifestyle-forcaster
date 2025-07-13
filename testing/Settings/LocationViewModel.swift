@@ -35,4 +35,14 @@ class LocationsViewModel: ObservableObject {
         print("Location moved. Net list: \(savedLocations)")
     }
     
+    func add(location: SavedLocation)
+    {
+        if !savedLocations.contains(where: { $0.displayName == location.displayName })
+        {
+            savedLocations.append(location)
+            print("New location added. List: \(savedLocations)")
+        }
+        
+    }
+    
 }

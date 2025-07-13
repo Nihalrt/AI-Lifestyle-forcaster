@@ -63,3 +63,19 @@ struct AirPollutionData: Codable {
 struct AirQualityIndex: Codable {
     let aqi: Int
 }
+
+
+struct GeoResponse: Codable, Identifiable
+{
+    let id = UUID()
+    let name: String
+    let lat: Double
+    let lon: Double
+    let country: String
+    let state: String?
+    
+    private enum CodingKeys: String, CodingKey
+    {
+        case name, lat, lon, country, state
+    }
+}

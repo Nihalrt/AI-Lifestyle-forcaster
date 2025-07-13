@@ -7,6 +7,8 @@ struct AddLocationView: View {
     
     @State private var searchText: String = ""
     
+    @State private var searchResults: [GeoResponse] = []
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -25,6 +27,7 @@ struct AddLocationView: View {
             .navigationTitle("Add New Location")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search for a city")
+            .onSubmit(of: .search, performSearch)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -35,6 +38,23 @@ struct AddLocationView: View {
             }
         }
     }
+    
+    func performSearch()
+    {
+        Task
+        {
+            do
+            {
+                let results = try await NetworkManager.shared.searchForCity(named: searchText, apiKey: KeyManager.getAPIKey(for: "OPENWEATHER_API_KEY"))
+                self.searchResults = results
+            } catch
+            {
+                print("City search failed: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
 }
 
 #Preview {

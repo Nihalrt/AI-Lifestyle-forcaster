@@ -70,4 +70,26 @@ class NetworkManager {
 
         return try JSONDecoder().decode(AQIResponse.self, from: data)
     }
+    
+    func searchForCity(named query: String, apiKey: String) async throws -> [GeoResponse]
+    {
+        var components = URLComponents(string: "https://api.openweathermap.org/geo/1.0/direct")
+        components?.queryItems = [
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "limit", value: "5"),
+            URLQueryItem(name: "appid", value: apiKey)
+        ]
+        
+        guard let url = components?.url else {
+            throw NetworkError.invalidURL
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw NetworkError.requestFailed
+        }
+        
+        return try JSONDecoder().decode([GeoResponse].self, from: data)
+    }
 }
