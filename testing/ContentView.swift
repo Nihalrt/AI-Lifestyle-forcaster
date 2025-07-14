@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var weatherViewModel: WeatherViewModel
+    @EnvironmentObject var locationsViewModel: LocationsViewModel // Now accesses locations
     
     @State private var greeting: String = "Welcome!"
     
@@ -11,7 +12,7 @@ struct ContentView: View {
             ThemedBackgroundView(theme: themeManager.currentTheme)
 
             if let weather = weatherViewModel.weatherResponse {
-                // UI reads from the shared weather object
+                // UI remains the same...
                 VStack(alignment: .leading) {
                     Spacer()
                     HStack { Image(systemName: "mappin.and.ellipse"); Text(weather.name) }
@@ -28,10 +29,9 @@ struct ContentView: View {
                 ProgressView().tint(.white).scaleEffect(2)
             }
         }
-        .task {
-            // When the app starts, this view tells the shared ViewModel to fetch all data
-            await weatherViewModel.fetchAllData(themeManager: themeManager)
-            await generateGreeting() // Then it generates its own greeting
+        .task(id: locationsViewModel.primaryLocation) {
+            await weatherViewModel.fetchAllData(for: locationsViewModel.primaryLocation, themeManager: themeManager)
+            await generateGreeting()
         }
     }
     
@@ -39,30 +39,13 @@ struct ContentView: View {
         guard let weather = weatherViewModel.weatherResponse else { return }
         do {
             self.greeting = try await AIManager.shared.generateDescription(from: weather)
-        } catch {
-            self.greeting = "Hello! A beautiful day awaits."
-        }
+        } catch { self.greeting = "Hello! A beautiful day awaits." }
     }
     
     private func systemIconName(for apiIconCode: String) -> String {
         // ... (this function remains the same)
         switch apiIconCode {
-            case "01d": return "sun.max.fill"
-            case "01n": return "moon.stars.fill"
-            case "02d": return "cloud.sun.fill"
-            case "02n": return "cloud.moon.fill"
-            case "03d", "03n", "04d", "04n": return "cloud.fill"
-            case "09d", "09n": return "cloud.drizzle.fill"
-            case "10d", "10n": return "cloud.rain.fill"
-            case "11d", "11n": return "cloud.bolt.rain.fill"
-            case "13d", "13n": return "cloud.snow.fill"
-            case "50d", "50n": return "cloud.fog.fill"
-            default: return "questionmark.circle"
+            case "01d": return "sun.max.fill"; case "01n": return "moon.stars.fill"; case "02d": return "cloud.sun.fill"; case "02n": return "cloud.moon.fill"; case "03d", "03n", "04d", "04n": return "cloud.fill"; case "09d", "09n": return "cloud.drizzle.fill"; case "10d", "10n": return "cloud.rain.fill"; case "11d", "11n": return "cloud.bolt.rain.fill"; case "13d", "13n": return "cloud.snow.fill"; case "50d", "50n": return "cloud.fog.fill"; default: return "questionmark.circle"
         }
     }
-}
-
-#Preview
-{
-    ContentView();
 }

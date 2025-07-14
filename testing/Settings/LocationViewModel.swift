@@ -22,6 +22,11 @@ class LocationsViewModel: ObservableObject {
         
     ]
     
+    var primaryLocation: SavedLocation
+    {
+        return savedLocations.first ?? SavedLocation(city: "Victoria", country: "CA")
+    }
+    
     func delete (at offsets: IndexSet)
     {
         savedLocations.remove(atOffsets: offsets)

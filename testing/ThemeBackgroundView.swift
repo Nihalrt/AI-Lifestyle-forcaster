@@ -48,7 +48,10 @@ struct ThemedBackgroundView: View {
 }
 
 // Add Equatable conformance to AppTheme for the animation to work
-extension AppTheme: Equatable {}
+extension AppTheme: Equatable
+{
+    
+}
 
 #Preview {
     // A preview to see one of our themes

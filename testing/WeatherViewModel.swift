@@ -17,28 +17,38 @@ class WeatherViewModel: ObservableObject {
         return (aqiValue, aqiDescription(for: aqiValue))
     }
 
-    // The single, master function to fetch all app data
-    func fetchAllData(themeManager: ThemeManager) async {
-        // Only fetch if data doesn't already exist.
-        guard weatherResponse == nil else { return }
+    // This is the master function to fetch all data.
+    // It now correctly takes the location as a parameter.
+    func fetchAllData(for location: SavedLocation, themeManager: ThemeManager) async {
+        // Clear old data to show loading spinners while new data is fetched.
+        // We only clear if the location has actually changed.
+        if self.weatherResponse?.name != location.city {
+            self.weatherResponse = nil
+            self.uvResponse = nil
+            self.aqiResponse = nil
+        } else {
+            // If the location is the same, no need to re-fetch.
+            return
+        }
         
-        print("🚀 Kicking off all master data fetches...")
+        print("🚀 Kicking off all master data fetches for \(location.displayName)...")
         
         let openWeatherKey = KeyManager.getAPIKey(for: "OPENWEATHER_API_KEY")
         let openUVKey = KeyManager.getAPIKey(for: "OPENUV_API_KEY")
         let waqiKey = KeyManager.getAPIKey(for: "WAQI_API_KEY")
 
-        let lat = 48.4284 // Victoria, BC
-        let lon = -123.3656
-        let city = "Victoria,CA"
+        // We need to get the coordinates for the new city.
+        guard let geoData = try? await NetworkManager.shared.searchForCity(named: location.displayName, apiKey: openWeatherKey).first else {
+            print("‼️ Could not find coordinates for \(location.displayName)")
+            return
+        }
 
         // Use async let to run all network calls in parallel for speed
-        async let weatherTask = NetworkManager.shared.fetchWeather(for: city, apiKey: openWeatherKey)
-        async let uvTask = NetworkManager.shared.fetchUVIndex(lat: lat, lon: lon, apiKey: openUVKey)
-        async let aqiTask = NetworkManager.shared.fetchAQI(for: city, apiKey: waqiKey)
+        async let weatherTask = NetworkManager.shared.fetchWeather(for: location.displayName, apiKey: openWeatherKey)
+        async let uvTask = NetworkManager.shared.fetchUVIndex(lat: geoData.lat, lon: geoData.lon, apiKey: openUVKey)
+        async let aqiTask = NetworkManager.shared.fetchAQI(for: location.displayName, apiKey: waqiKey)
         
         do {
-            // Await all results together
             let (weatherData, uvData, aqiData) = try await (weatherTask, uvTask, aqiTask)
             
             // Update all our @Published properties, which will update the entire app UI
@@ -46,7 +56,6 @@ class WeatherViewModel: ObservableObject {
             self.uvResponse = uvData
             self.aqiResponse = aqiData
             
-            // Update the app's theme based on the primary weather data
             themeManager.updateTheme(from: weatherData)
             
         } catch {

@@ -13,11 +13,34 @@ struct AddLocationView: View {
         NavigationStack {
             ZStack {
                 ThemedBackgroundView(theme: themeManager.currentTheme)
+            
                 
                 VStack {
-                    List {
-                        Text("Search results will appear here...")
+                    // We now display the search results in our list
+                    List(searchResults) { location in
+                        Button(action: {
+                            // When a result is tapped, add it to the view model
+                            // and dismiss the screen.
+                            let newLocation = SavedLocation(city: location.name, country: location.country)
+                            locationsViewModel.add(location: newLocation)
+                            dismiss()
+                        }) {
+                            VStack(alignment: .leading) {
+                                Text(location.name)
+                                    .font(.headline)
+                                
+                                // Display the state/province if it exists
+                                if let state = location.state {
+                                    Text("\(state), \(location.country)")
+                                        .font(.subheadline)
+                                } else {
+                                    Text(location.country)
+                                        .font(.subheadline)
+                                }
+                            }
                             .foregroundColor(.white)
+                        }
+                        .listRowBackground(Color.white.opacity(0.1))
                     }
                     .listStyle(.plain)
                     .background(.clear)

@@ -1,15 +1,12 @@
 import SwiftUI
 
-// Blueprint for a single message
 struct ChatMessage: Identifiable {
     let id = UUID()
     let text: String
     let isUserMessage: Bool
 }
 
-
 struct Planner: View {
-    // Get access to the shared managers
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var weatherViewModel: WeatherViewModel
 
@@ -21,129 +18,84 @@ struct Planner: View {
         "What's the best day for a hike?",
         "Should I wear a jacket tomorrow?",
         "Will it rain this weekend?",
-        "Good time for outdoor yoga?",
     ]
 
     var body: some View {
         ZStack {
             ThemedBackgroundView(theme: themeManager.currentTheme)
-
-            VStack {
-                Text("Activity Planner")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding(.top)
-
+            VStack(spacing: 0) {
+                Text("Activity Planner").font(.largeTitle.weight(.bold)).foregroundColor(.white).padding()
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         ForEach(suggestions, id: \.self) { suggestion in
                             Button(action: { userQuery = suggestion }) {
-                                Text(suggestion)
-                                    .padding(.horizontal, 15)
-                                    .padding(.vertical, 8)
-                                    .background(Color.white.opacity(0.15))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(20)
+                                Text(suggestion).padding(.horizontal, 15).padding(.vertical, 8).background(Color.white.opacity(0.15)).foregroundColor(.white).clipShape(Capsule())
                             }
                         }
-                    }
-                    .padding(.horizontal)
-                }
-                .padding(.bottom)
-                
-                // The main conversation view
+                    }.padding(.horizontal)
+                }.padding(.bottom)
                 ScrollView {
                     VStack(spacing: 12) {
                         ForEach(conversation) { message in
                             ChatBubble(message: message)
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
-
                         if isAwaitingResponse {
                             ChatBubble(message: ChatMessage(text: "...", isUserMessage: false))
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
-                    }
-                    .padding(.top, 1)
+                    }.padding(.top, 1)
                 }
                 .scrollDismissesKeyboard(.interactively)
-
                 Spacer()
-
-                HStack(spacing: 15) {
+                HStack(spacing: 12) {
                     TextField("Ask me anything...", text: $userQuery, axis: .vertical)
-                        .foregroundColor(.white)
-                        .padding(.leading)
-                    
+                        .foregroundColor(.white).padding(.horizontal)
                     Button(action: sendMessage) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.largeTitle)
-                            .tint(.white)
+                        Image(systemName: "arrow.up.circle.fill").font(.largeTitle).tint(.white)
                     }
-                    .disabled(userQuery.isEmpty)
-                    .opacity(userQuery.isEmpty ? 0.5 : 1.0)
-                    .padding(.trailing)
+                    .disabled(userQuery.isEmpty).opacity(userQuery.isEmpty ? 0.5 : 1.0)
                 }
-                .padding(.vertical, 10)
-                .background(.ultraThinMaterial)
-                .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color.white.opacity(0.2), lineWidth: 1))
-                .cornerRadius(25)
-                .padding(.horizontal)
-                .padding(.bottom, 5)
+                .padding(8).padding(.leading, 8).background(.ultraThinMaterial).clipShape(Capsule()).padding()
             }
         }
     }
 
     func sendMessage() {
         let userMessage = ChatMessage(text: userQuery, isUserMessage: true)
-        withAnimation {
+        withAnimation(.spring()) {
             conversation.append(userMessage)
         }
         
         let queryForAI = userQuery
+        
         userQuery = ""
         isAwaitingResponse = true
         
         Task {
             do {
-                var prompt = "You are Nimbus, a friendly weather planning assistant. A user has asked: '\(queryForAI)'."
-                
-                if let weather = weatherViewModel.weatherResponse {
-                    let weatherContext = """
-                    
-                    For context, here is the current weather in their location (\(weather.name)):
-                    - Temperature: \(String(format: "%.0f", weather.main.temp))°C
-                    - Condition: \(weather.weather.first?.description ?? "clear")
-                    """
-                    prompt += weatherContext
-                }
-                prompt += "\n\nBriefly answer their question in a conversational and helpful way."
-                
-                let aiResponseText = try await AIManager.shared.getAIResponse(for: conversation)
+                let aiResponseText = try await AIManager.shared.getAIResponse(for: conversation, with: weatherViewModel.weatherResponse)
                 let aiMessage = ChatMessage(text: aiResponseText, isUserMessage: false)
                 
                 await MainActor.run {
-                    withAnimation {
+                    withAnimation(.spring()) {
                         isAwaitingResponse = false
                         conversation.append(aiMessage)
                     }
                 }
             } catch {
                 await MainActor.run {
-                    withAnimation {
+                    withAnimation(.spring()) {
                         isAwaitingResponse = false
-                        let errorMessage = ChatMessage(text: "Sorry, I had trouble connecting. Please try again.", isUserMessage: false)
+                        let errorMessage = ChatMessage(text: "Sorry, I ran into an error. Please try again.", isUserMessage: false)
                         conversation.append(errorMessage)
                     }
                 }
-                print("Error calling AI in PlannerView: \(error)")
+                print("‼️ Error calling AI in PlannerView: \(error)")
             }
         }
     }
 }
 
-// --- THIS IS THE MISSING PIECE ---
+// --- THIS IS THE MISSING PIECE THAT IS NOW ADDED BACK ---
 // The "blueprint" for a single chat bubble view.
 struct ChatBubble: View {
     let message: ChatMessage
@@ -170,13 +122,11 @@ struct ChatBubble: View {
 }
 
 
-// --- THIS IS THE CORRECTED PREVIEW BLOCK ---
 #Preview {
     ZStack {
         ThemedBackgroundView(theme: .cloudy)
         Planner()
             .environmentObject(ThemeManager())
-            // The preview also needs access to the WeatherViewModel
             .environmentObject(WeatherViewModel())
     }
 }
